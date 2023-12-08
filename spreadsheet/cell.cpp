@@ -60,13 +60,9 @@ void Cell::Set(std::string text) {
                 throw CircularDependencyException("Circular dependency has been evaluated");
             }
         }
-
-        impl_ = std::move(tmp_impl);
     }
 
-    else {
-        impl_ = std::move(tmp_impl);
-    }
+    impl_ = std::move(tmp_impl);
     // Cyclic dependencies 
 
     // Updating references
