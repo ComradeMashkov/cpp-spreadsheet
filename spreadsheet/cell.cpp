@@ -15,20 +15,7 @@ Cell::Cell(Sheet& sheet)
 
 Cell::~Cell() = default;
 
-void Cell::Set(std::string text) {
-    std::unique_ptr<Impl> tmp_impl;
-
-    if (text.empty()) {
-        tmp_impl = std::make_unique<EmptyImpl>();
-    }
-    else if (text.size() >= 2 && text.at(0) == FORMULA_SIGN) {
-        tmp_impl = std::make_unique<FormulaImpl>(std::move(text), sheet_);
-    }
-    else {
-        tmp_impl = std::make_unique<TextImpl>(std::move(text));
-    }
-
-    // Cyclic dependencies 
+void Cell::CheckCyclicDependencies(std::unique_ptr<Impl> tmp_impl) {
     const Impl& tmp_impl_cyclic = *tmp_impl;
     const auto tmp_referenced_cells = tmp_impl_cyclic.GetReferencedCells();
 
@@ -63,9 +50,9 @@ void Cell::Set(std::string text) {
     }
 
     impl_ = std::move(tmp_impl);
-    // Cyclic dependencies 
+}
 
-    // Updating references
+void Cell::UpdateReferences() {
     for (Cell* ref : referenced_cells_) {
         ref->dependent_cells_.erase(this);
     }
@@ -83,9 +70,25 @@ void Cell::Set(std::string text) {
         referenced_cells_.insert(ref);
         ref->dependent_cells_.insert(this);
     }
-    // Updating references
+}
 
-    // Cache invalidation
+void Cell::Set(std::string text) {
+    std::unique_ptr<Impl> tmp_impl;
+
+    if (text.empty()) {
+        tmp_impl = std::make_unique<EmptyImpl>();
+    }
+    else if (text.size() >= 2 && text.at(0) == FORMULA_SIGN) {
+        tmp_impl = std::make_unique<FormulaImpl>(std::move(text), sheet_);
+    }
+    else {
+        tmp_impl = std::make_unique<TextImpl>(std::move(text));
+    }
+
+    CheckCyclicDependencies(std::move(tmp_impl));
+
+    UpdateReferences();
+
     InvalidateAllCache(true);
 
 }

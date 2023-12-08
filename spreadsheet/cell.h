@@ -9,9 +9,15 @@
 class Sheet;
 
 class Cell : public CellInterface {
+private:
+    class Impl;
+
 public:
     Cell(Sheet& sheet);
     ~Cell();
+
+    void CheckCyclicDependencies(std::unique_ptr<Impl> tmp_impl);
+    void UpdateReferences();
 
     void Set(std::string text);
     void Clear();
