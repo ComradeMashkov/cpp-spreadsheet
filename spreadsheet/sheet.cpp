@@ -12,10 +12,14 @@ using namespace std::literals;
 
 Sheet::~Sheet() {}
 
-void Sheet::SetCell(Position pos, std::string text) {
+void Sheet::IsPositionValid(Position pos, const std::string& error_message) const {
     if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to set a cell: invalid cell position");
+        throw InvalidPositionException(error_message);
     }
+}
+
+void Sheet::SetCell(Position pos, std::string text) {
+    IsPositionValid(pos, "Failed to set a cell: invalid cell position"s);
     
     table_.resize(std::max(pos.row + 1, int(std::size(table_))));
     table_[pos.row].resize(std::max(pos.col + 1, int(std::size(table_[pos.row]))));
@@ -28,9 +32,7 @@ void Sheet::SetCell(Position pos, std::string text) {
 }
 
 const CellInterface* Sheet::GetCell(Position pos) const {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to get a cell: invalid cell position");
-    }
+    IsPositionValid(pos, "Failed to get a cell: invalid cell position"s);
     
     if (pos.row < int(std::size(table_)) && pos.col < int(std::size(table_[pos.row]))) {
         if (table_[pos.row][pos.col].get()->GetText() == "") {
@@ -44,9 +46,7 @@ const CellInterface* Sheet::GetCell(Position pos) const {
 }
 
 CellInterface* Sheet::GetCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to get a cell: invalid cell position");
-    }
+    IsPositionValid(pos, "Failed to get a cell: invalid cell position"s);
     
     if (pos.row < int(std::size(table_)) && pos.col < int(std::size(table_[pos.row]))) {
         if (table_[pos.row][pos.col].get()->GetText() == "") {
@@ -60,9 +60,7 @@ CellInterface* Sheet::GetCell(Position pos) {
 }
 
 const Cell* Sheet::GetRegularCell(Position pos) const {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to get a cell: invalid cell position");
-    }
+    IsPositionValid(pos, "Failed to get a cell: invalid cell position"s);
     
     if (pos.row < int(std::size(table_)) && pos.col < int(std::size(table_[pos.row]))) {
         return table_[pos.row][pos.col].get();
@@ -72,9 +70,7 @@ const Cell* Sheet::GetRegularCell(Position pos) const {
 }
 
 Cell* Sheet::GetRegularCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to get a cell: invalid cell position");
-    }
+    IsPositionValid(pos, "Failed to get a cell: invalid cell position"s);
     
     if (pos.row < int(std::size(table_)) && pos.col < int(std::size(table_[pos.row]))) {
         return table_[pos.row][pos.col].get();
@@ -84,9 +80,7 @@ Cell* Sheet::GetRegularCell(Position pos) {
 }
 
 void Sheet::ClearCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("Failed to clear a cell: invalid cell position");
-    }
+    IsPositionValid(pos, "Failed to clear a cell: invalid cell position"s);
     
     if (pos.row < int(std::size(table_)) && pos.col < int(std::size(table_[pos.row]))) {
         if (table_[pos.row][pos.col]) {

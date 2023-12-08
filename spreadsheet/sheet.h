@@ -24,8 +24,7 @@ public:
     void PrintValues(std::ostream& output) const override;
     void PrintTexts(std::ostream& output) const override;
 
-	// Можете дополнить ваш класс нужными полями и методами
-
+	void IsPositionValid(Position pos, const std::string& error_message) const;
 
 private:
 	std::vector<std::vector<std::unique_ptr<Cell>>> table_;
